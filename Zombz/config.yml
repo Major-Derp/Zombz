@@ -1,0 +1,23 @@
+# Default Zombz config.yml
+
+General_Zombie_Modifications:
+  Zombie_Damage: 4
+  Zombie_Death_During_Day: false
+  Zombie_Potion_Effect(Seconds): 4
+  Zombie_Exp_Drop: 5
+  Zombie_Drops:
+    - 5:2
+    - 3
+Zombie_Spawn:
+  Zombie_Spawn_On_Death: true
+Zombie_Group_Spawn:
+  Group_Spawn: true
+  Zombie_Group_Spawn_Number: 3
+  Zombie_Random_Group_Spawn: true
+  Zombie_Random_Group_Spawn_Number: 5
+Only_Zombies: false
+Auto_Config_Update: true
+Enabled_Worlds:
+  - world
+Do_Not_Edit_Below_This_Line:
+  Version: 0.5

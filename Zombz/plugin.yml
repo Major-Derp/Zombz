@@ -1,0 +1,6 @@
+name: Zombz
+main: me.Iqbal.Zombz.Zombz
+version: 0.5
+author: Major_Derp
+description: Zombz. Simple Zombie Modifier.
+commands:
