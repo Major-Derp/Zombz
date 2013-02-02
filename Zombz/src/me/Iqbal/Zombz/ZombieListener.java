@@ -194,6 +194,6 @@ This is boring
 
 Bye!
 
-event.setCancelled(true);
+event.thisConversation().setCancelled(true);
 
 */
