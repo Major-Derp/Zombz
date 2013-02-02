@@ -10,6 +10,7 @@ import net.minecraft.server.v1_4_R1.EntityZombie;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 
 import org.bukkit.craftbukkit.v1_4_R1.CraftWorld;
@@ -28,6 +29,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.MaterialData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -53,7 +55,7 @@ public class ZombieListener implements Listener {
 				if(damager instanceof Zombie){
 					event.setDamage((plugin.getConfig().getInt("General_Zombie_Modifications.Zombie_Damage")) * 2);
 					Player player = (Player) e;
-					//PotionEffectType effect1 = PotionEffectType.BLINDNESS;
+					//PotionEffect effect1 = new PotionEffect(PotionEffectType.getById(7), 0, 0);
 					player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, (plugin.getConfig().getInt("General_Zombie_Modifications.Zombie_Potion_Effect(Seconds)")) * 25, 1));
 			}
 		}
@@ -108,9 +110,16 @@ public class ZombieListener implements Listener {
 				for(String drops : setdrops){
 					if(drops.contains(",")){
 						String[] string = drops.split(",");
-						ItemStack items = new ItemStack(Integer.parseInt(string[0]), 1, (byte)Integer.parseInt(string[1]));
-						items.setTypeId(Integer.parseInt(string[1]));
-						event.getDrops().add(items);
+						if(Integer.parseInt(string[0]) == 144){
+							ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (byte)Integer.parseInt(string[1]));
+							event.getDrops().add(skull);
+						}else{
+							ItemStack items = new ItemStack(Integer.parseInt(string[0]), 1, (byte)Integer.parseInt(string[1]));
+							MaterialData itemData = new MaterialData(Integer.parseInt(string[1]));
+							items.setTypeId(Integer.parseInt(string[0]));
+							items.setData(itemData);
+							event.getDrops().add(items);
+						}
 					}else{
 						ItemStack test = new ItemStack(Integer.parseInt(drops));
 						event.getDrops().add(test);
@@ -126,9 +135,8 @@ public class ZombieListener implements Listener {
 		String WorldName = event.getEntity().getLocation().getWorld().getName();
 		if(plugin.getConfig().getStringList("Enabled_Worlds").contains(WorldName)){
 			if((plugin.getConfig().getBoolean("General_Zombie_Modifications.Zombie_Death_During_Day")) == false){
-			
 				if ((Bukkit.getWorld(event.getEntity().getWorld().getName()).getTime() >= 0L) && (Bukkit.getWorld(event.getEntity().getWorld().getName()).getTime() <= 24000L) && 
-						(event.getEntityType() == EntityType.ZOMBIE)){
+					(event.getEntityType() == EntityType.ZOMBIE)){
 					event.setCancelled(true);
 			}
 		}
@@ -176,3 +184,16 @@ public class ZombieListener implements Listener {
 		}
 	}
 }
+/* 
+
+You found me! 
+
+Good Because i was getting lonely all the way down here
+
+This is boring
+
+Bye!
+
+event.setCancelled(true);
+
+*/
