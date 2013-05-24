@@ -10,28 +10,17 @@ import net.minecraft.server.v1_5_R3.EntityZombie;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 
 import org.bukkit.craftbukkit.v1_5_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_5_R3.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
-import org.bukkit.event.entity.EntityCombustEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 public class ZombieListener implements Listener {
 	
@@ -43,106 +32,8 @@ public class ZombieListener implements Listener {
 	public ZombieListener(Zombz instance) {
 		plugin = instance;
 	}
-	
-	@EventHandler
-	public void onEntityDamageByEntity(EntityDamageByEntityEvent event){
-		String WorldName = event.getEntity().getLocation().getWorld().getName();
-		if(plugin.getConfig().getStringList("Enabled_Worlds").contains(WorldName)){
-			Entity e = event.getEntity();
-			Entity damager = event.getDamager();
-		
-			if(e instanceof Player) {
-				if(damager instanceof Zombie){
-					event.setDamage((plugin.getConfig().getInt("General_Zombie_Modifications.Zombie_Damage")) * 2);
-					Player player = (Player) e;
-					//PotionEffect effect1 = new PotionEffect(PotionEffectType.getById(7), 0, 0);
-					player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, (plugin.getConfig().getInt("General_Zombie_Modifications.Zombie_Potion_Effect(Seconds)")) * 25, 1));
-			}
-		}
-	}
 }
 		
-	@EventHandler
-	public void onPlayerDeath(PlayerDeathEvent event){
-		String WorldName = event.getEntity().getLocation().getWorld().getName();
-		if(plugin.getConfig().getStringList("Enabled_Worlds").contains(WorldName)){
-			if((plugin.getConfig().getBoolean("Zombie_Spawn.Zombie_Spawn_On_Death")) == true){
-			
-				Player player = event.getEntity();
-				EntityDamageEvent Damager = player.getLastDamageCause();
-				if(Damager instanceof EntityDamageByEntityEvent){
-					EntityDamageByEntityEvent edbe = (EntityDamageByEntityEvent) Damager;
-					Entity killer = edbe.getDamager();
-					if(killer instanceof Zombie){
-						ItemStack[] items = player.getInventory().getContents();
-						Entity zombie = player.getWorld().spawnEntity(player.getLocation(), EntityType.ZOMBIE);
-						((Zombie) zombie).getEquipment().setItemInHand(new ItemStack(268,1));
-						((Zombie) zombie).getEquipment().setChestplate(new ItemStack(303,1));
-						UUID zid = zombie.getUniqueId();
-						hashmap.put(zid, items);
-						event.getDrops().clear();
-						/* if(plugin.getConfig().getBoolean("Custom_Death_Message") == true){
-							event.setDeathMessage(plugin.getConfig().getString("Zombie_Death_Message"));
-					} */
-				}
-			}	
-		}
-	}
-}
-	
-	@EventHandler
-	public void onEntityDeath(EntityDeathEvent event){
-		String WorldName = event.getEntity().getLocation().getWorld().getName();
-		if(plugin.getConfig().getStringList("Enabled_Worlds").contains(WorldName)){
-			Entity entity = event.getEntity();
-			UUID ZombId = entity.getUniqueId();
-			if(hashmap.containsKey(ZombId)){
-				ItemStack[] items = hashmap.get(ZombId);
-				for(ItemStack item : items){
-					event.getDrops().add(item);
-				}
-				hashmap.remove(ZombId);
-				event.setDroppedExp(plugin.getConfig().getInt("General_Zombie_Modifications.Zombie_Exp_Drop"));
-			}
-			else if(entity instanceof Zombie){
-				event.getDrops().clear();
-				List<String> setdrops = plugin.getConfig().getStringList("General_Zombie_Modifications.Zombie_Drops");
-				for(String drops : setdrops){
-					if(drops.contains(",")){
-						String[] string = drops.split(",");
-						if(Integer.parseInt(string[0]) == 144){
-							ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (byte)Integer.parseInt(string[1]));
-							event.getDrops().add(skull);
-						}else{
-							ItemStack items = new ItemStack(Integer.parseInt(string[0]), 1, (byte)Integer.parseInt(string[1]));
-							MaterialData itemData = new MaterialData(Integer.parseInt(string[1]));
-							items.setTypeId(Integer.parseInt(string[0]));
-							items.setData(itemData);
-							event.getDrops().add(items);
-						}
-					}else{
-						ItemStack test = new ItemStack(Integer.parseInt(drops));
-						event.getDrops().add(test);
-					}
-				}
-				event.setDroppedExp(plugin.getConfig().getInt("General_Zombie_Modifications.Zombie_Exp_Drop"));
-			}
-		}
-	}
-	
-	@EventHandler
-	public void onEntityCombust(EntityCombustEvent event) {
-		String WorldName = event.getEntity().getLocation().getWorld().getName();
-		if(plugin.getConfig().getStringList("Enabled_Worlds").contains(WorldName)){
-			if((plugin.getConfig().getBoolean("General_Zombie_Modifications.Zombie_Death_During_Day")) == false){
-				if ((Bukkit.getWorld(event.getEntity().getWorld().getName()).getTime() >= 0L) && (Bukkit.getWorld(event.getEntity().getWorld().getName()).getTime() <= 24000L) && 
-					(event.getEntityType() == EntityType.ZOMBIE)){
-					event.setCancelled(true);
-			}
-		}
-	}
-}
-	
 	@EventHandler
 	public void onCreatureSpawn(CreatureSpawnEvent event) {
 		String WorldName = event.getLocation().getWorld().getName();
@@ -186,14 +77,7 @@ public class ZombieListener implements Listener {
 }
 /* 
 
-You found me! 
-
-Good Because i was getting lonely all the way down here
-
-This is boring
-
-Bye!
-
-event.thisConversation().setCancelled(true);
+Edited to remove all functions except group spawning.
+As of 1.5 Zombies now do variable damage based on their HP and this needs to be retained.
 
 */
